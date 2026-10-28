@@ -8,7 +8,7 @@ local DESIGN_URL = "https://raw.githubusercontent.com/MaxFOG120/FL/refs/heads/ma
 
 -- Пока Discord-сервер не создан, оставь строку пустой.
 -- Когда появится приглашение, вставь его сюда — ссылка будет копироваться при запуске.
-local DISCORD_INVITE_URL = ""
+local DISCORD_INVITE_URL = "https://discord.gg/6DAMzHeMr"
 local function copyDiscordInvite()
     local invite = DISCORD_INVITE_URL
     if type(invite) ~= "string" or invite == "" then
@@ -8275,6 +8275,21 @@ if not designSource then
     end)
     if okHttp and type(remoteSource) == "string" and #remoteSource > 0 then
         designSource = remoteSource
+        pcall(function()
+            if writefile then
+                if makefolder and not (isfolder and isfolder("FlinHUB")) then
+                    makefolder("FlinHUB")
+                end
+                writefile("FlinHUB/FlinDesign.cache.lua", remoteSource)
+            end
+        end)
+    elseif type(isfile) == "function" and type(readfile) == "function" then
+        local okCache, cached = pcall(function()
+            return isfile("FlinHUB/FlinDesign.cache.lua") and readfile("FlinHUB/FlinDesign.cache.lua") or nil
+        end)
+        if okCache and type(cached) == "string" and #cached > 0 then
+            designSource = cached
+        end
     end
 end
 

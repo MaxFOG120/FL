@@ -1550,7 +1550,7 @@ do
             Parent = items.MainFrame.Instance,
             Name = "\000",
             BackgroundTransparency = 1,
-            Size = newUDim2(0, 78, 1, 0),
+            Size = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 78 or 176, 1, 0),
             BorderColor3 = fromRGB(0, 0, 0),
             ZIndex = 2,
             BorderSizePixel = 0,
@@ -1653,8 +1653,8 @@ do
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             BackgroundTransparency = 1,
-            Position = newUDim2(0, 79, 0, 0),
-            Size = newUDim2(1, -79, 1, 0),
+            Position = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 79 or 177, 0, 0),
+            Size = newUDim2(1, game:GetService("UserInputService").TouchEnabled and -79 or -177, 1, 0),
             ZIndex = 2,
             ClipsDescendants = true,
             BorderSizePixel = 0,
@@ -3620,7 +3620,7 @@ local window = connection:Window({
     Logo = "F",
     FadeSpeed = 0,
     PagePadding = 19,
-    Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 420, 0, 460) or UDim2.new(0, 760, 0, 520),
+    Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 420, 0, 460) or UDim2.new(0, 880, 0, 540),
 })
 tbl.Window = window
 pcall(function()
@@ -3753,7 +3753,7 @@ function window:SetSize(v5)
     local scale = math.clamp(number2, 0.5, 2)
     n2 = scale
     Flin_MenuScale = scale
-    self.Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 420, 0, 460) or UDim2.new(0, 760, 0, 540)
+    self.Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 420, 0, 460) or UDim2.new(0, 880, 0, 540)
     if self.Items and self.Items.MainFrame then
         self.Items.MainFrame.Instance.Size = self.Size
         local instance2 = self.Items.ProportionalScale and self.Items.ProportionalScale.Instance
@@ -4792,37 +4792,99 @@ end);
         end,
     })
     local miscSection = uiRefs.GenTab:AddSection({Name = "Misc", Position = "right"})
-    tbl.kbBtnRow(miscSection, "FpsBoost", {
-        Name = "FPS Boost",
-        Icon = "lightning-bolt",
-        Callback = function()
-            local terrain = workspace:FindFirstChildOfClass("Terrain")
-            if terrain then
+    local boostDone = setmetatable({}, {__mode = "k"})
+    local function optimizeObject(obj)
+        if boostDone[obj] then return end
+        boostDone[obj] = true
+        if obj:IsA("BasePart") then
+            obj.CastShadow = false
+            obj.Reflectance = 0
+            if obj.Material ~= Enum.Material.SmoothPlastic and not obj:IsA("Terrain") then
+                obj.Material = Enum.Material.SmoothPlastic
+            end
+            if obj:IsA("MeshPart") then
+                obj.RenderFidelity = Enum.RenderFidelity.Performance
+            end
+        elseif obj:IsA("Decal") or obj:IsA("Texture") then
+            obj.Transparency = 1
+        elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
+            obj.Enabled = false
+        elseif obj:IsA("PostEffect") then
+            obj.Enabled = false
+        elseif obj:IsA("Atmosphere") then
+            obj.Density = 0
+            obj.Haze = 0
+        end
+    end
+    local boostRunning = false
+    local function runBoost()
+        if boostRunning then return end
+        boostRunning = true
+        local Lighting2 = game:GetService("Lighting")
+        pcall(function()
+            Lighting2.GlobalShadows = false
+            Lighting2.FogEnd = 9e9
+            Lighting2.Brightness = math.min(Lighting2.Brightness, 2)
+            Lighting2.EnvironmentDiffuseScale = 0
+            Lighting2.EnvironmentSpecularScale = 0
+        end)
+        pcall(sethiddenproperty, Lighting2, "Technology", Enum.Technology.Compatibility)
+        pcall(function() settings().Rendering.QualityLevel = Enum.QualityLevel.Level01 end)
+        pcall(function() settings().Rendering.EagerBulkExecution = true end)
+        pcall(function() if setfpscap then setfpscap(0) end end)
+        local terrain = workspace:FindFirstChildOfClass("Terrain")
+        if terrain then
+            pcall(function()
                 terrain.WaterWaveSize = 0
                 terrain.WaterWaveSpeed = 0
                 terrain.WaterReflectance = 0
-            end
-            game.Lighting.GlobalShadows = false
-            game.Lighting.FogEnd = 9000000000
-            pcall(function()
-                settings().Rendering.QualityLevel = 1
+                terrain.WaterTransparency = 1
             end)
-            for _, descendant in pairs(game:GetDescendants()) do
-                if descendant:IsA("BasePart") then
-                    descendant.Material = Enum.Material.Plastic
-                    descendant.Reflectance = 0
-                elseif descendant:IsA("Decal") then
-                    descendant.Transparency = 1
-                elseif descendant:IsA("ParticleEmitter") or descendant:IsA("Trail") then
-                    descendant.Lifetime = NumberRange.new(0)
+            pcall(sethiddenproperty, terrain, "Decoration", false)
+        end
+        task.spawn(function()
+            local count = 0
+            for _, root in ipairs({Lighting2, workspace}) do
+                for _, obj in ipairs(root:GetDescendants()) do
+                    pcall(optimizeObject, obj)
+                    count = count + 1
+                    if count % 250 == 0 then task.wait() end
                 end
             end
-            for _, descendant in pairs(game.Lighting:GetDescendants()) do
-                if descendant:IsA("BlurEffect") or descendant:IsA("SunRaysEffect") or descendant:IsA("ColorCorrectionEffect") or descendant:IsA("BloomEffect") then
-                    descendant.Enabled = false
-                end
+            boostRunning = false
+            tbl3.new({Title = "Misc", Content = "FPS Boost applied (" .. count .. " objects).", Duration = 3})
+        end)
+    end
+    tbl.kbBtnRow(miscSection, "FpsBoost", {
+        Name = "FPS Boost",
+        Icon = "lightning-bolt",
+        Callback = runBoost,
+    })
+    local autoBoostConn, boostQueue = nil, {}
+    tbl.kbTglRow(miscSection, "AutoFpsBoost", "Auto FPS Boost", {
+        Default = false,
+        Callback = function(on)
+            if autoBoostConn then
+                autoBoostConn:Disconnect()
+                autoBoostConn = nil
             end
-            tbl3.new({Title = "Misc", Content = "FPS Boost applied!", Duration = 3})
+            if on then
+                runBoost()
+                autoBoostConn = workspace.DescendantAdded:Connect(function(obj)
+                    boostQueue[#boostQueue + 1] = obj
+                end)
+                task.spawn(function()
+                    while autoBoostConn do
+                        local n = math.min(#boostQueue, 120)
+                        for i = 1, n do
+                            local obj = table.remove(boostQueue)
+                            if obj and obj.Parent then pcall(optimizeObject, obj) end
+                        end
+                        task.wait(0.15)
+                    end
+                    table.clear(boostQueue)
+                end)
+            end
         end,
     })
     tbl.kbBtnRow(miscSection, "GetPing", {
@@ -9418,7 +9480,7 @@ pcall(function()
     local textLabel = getTextLabel("")
     local imageLabel2 = getImageLabel(10734961133)
     local textLabel2 = getTextLabel("")
-    local imageLabel3 = getImageLabel(101909399146074)
+    local imageLabel3 = getImageLabel(0)
     local v11 = table.pack(Color3.fromRGB(224, 116, 24))
     local n6 = v11.n
     v11.n = 2 + n6 - 1
@@ -9429,7 +9491,17 @@ pcall(function()
     fn63(stroke, "Color", "Border")
     fn63(imageLabel, "ImageColor3", "Accent")
     fn63(imageLabel2, "ImageColor3", "Accent")
-    fn63(imageLabel3, "ImageColor3", "Accent")
+    do
+        local logoAsset = getgenv().FlinLogoAsset
+        if logoAsset then
+            imageLabel3.Image = logoAsset
+            imageLabel3.ImageColor3 = Color3.new(1, 1, 1)
+            imageLabel3.Size = UDim2.new(0, 20, 0, 20)
+            Instance.new("UICorner", imageLabel3).CornerRadius = UDim.new(1, 0)
+        else
+            imageLabel3.Visible = false
+        end
+    end
     fn63(textLabel, "TextColor3", "Text")
     fn63(textLabel2, "TextColor3", "Text")
     fn63(textLabel3, "TextColor3", "Accent")
@@ -9594,6 +9666,75 @@ if window.Items.Shadow and window.Items.Shadow.Instance then
     window.Items.Shadow.Instance.Size = UDim2.new(1, 55, 1, 55)
     window.Items.Shadow.Instance.Position = UDim2.new(0.5, 0, 0.5, 0)
 end
+-- ===== FlinHUB layout: wide sidebar with labelled tabs =====
+pcall(function()
+    if game:GetService("UserInputService").TouchEnabled then return end
+    local sidebar = window.Items.Sidebar.Instance
+    local mark = sidebar:FindFirstChild("FlinAvatar")
+    if mark then
+        mark.AnchorPoint = Vector2.new(0, 0)
+        mark.Position = UDim2.new(0, 16, 0, 14)
+        mark.Size = UDim2.fromOffset(52, 52)
+    end
+    local wm = sidebar:FindFirstChild("FlinHubWordmark")
+    if wm then
+        wm.Position = UDim2.new(0, 76, 0, 14)
+        wm.Size = UDim2.new(1, -84, 0, 52)
+        wm.TextXAlignment = Enum.TextXAlignment.Left
+        wm.TextSize = 26
+    end
+    local list = window.Items.Pages.Instance
+    list.Position = UDim2.new(0, 0, 0, 86)
+    list.Size = UDim2.new(1, 0, 1, -150)
+    local layout = list:FindFirstChildOfClass("UIListLayout")
+    if layout then layout.Padding = UDim.new(0, 8) end
+    local meta = {
+        ["gear"] = {1, "General"},
+        ["crosshairs"] = {2, "MM2"},
+        ["person"] = {3, "Target"},
+        ["eye"] = {4, "Visuals"},
+        ["star"] = {5, "Fun"},
+        ["person-jumping"] = {6, "Emotes"},
+        ["speaker"] = {7, "Sound"},
+    }
+    for _, page in ipairs(window.Pages) do
+        local info = meta[page.Icon]
+        local btn = page.Items and page.Items.Inactive and page.Items.Inactive.Instance
+        if info and btn and btn.Parent == list then
+            btn.LayoutOrder = info[1]
+            btn.Size = UDim2.new(1, -28, 0, 40)
+            btn.TextXAlignment = Enum.TextXAlignment.Left
+            btn.BackgroundTransparency = 1
+            btn.BackgroundColor3 = connection.Theme.Element
+            local pad = Instance.new("UIPadding", btn)
+            pad.PaddingLeft = UDim.new(0, 14)
+            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+            local st = Instance.new("UIStroke", btn)
+            st.Thickness = 1.5
+            st.Color = connection.Theme.Border
+            st.Transparency = 1
+            local lbl = Instance.new("TextLabel")
+            lbl.BackgroundTransparency = 1
+            lbl.Text = info[2]
+            lbl.FontFace = FlinFont
+            lbl.TextSize = 18
+            lbl.TextColor3 = connection.Theme.Text
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            lbl.Position = UDim2.new(0, 38, 0, 0)
+            lbl.Size = UDim2.new(1, -38, 1, 0)
+            lbl.ZIndex = btn.ZIndex + 1
+            lbl.Parent = btn
+            local function sync()
+                local active = btn.TextTransparency < 0.25
+                lbl.TextTransparency = active and 0 or 0.45
+                st.Transparency = active and 0 or 1
+                btn.BackgroundTransparency = active and 0.55 or 1
+            end
+            btn:GetPropertyChangedSignal("TextTransparency"):Connect(sync)
+            sync()
+        end
+    end
+end)
 if tbl and tbl.Language == "Russian" then
     task.defer(function()
         local applyLanguage = tbl

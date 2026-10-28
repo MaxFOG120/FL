@@ -2749,7 +2749,7 @@ do
         function tbl.kbBind(v3, item, v4)
             local option = v3:AddOption()
             tbl.kbUI = tbl.kbUI or {}
-            local keybind = option:AddLabel("Бинд клавиши"):AddKeybind({
+            local keybind = option:AddLabel("Keybind"):AddKeybind({
                 Callback = function(key)
                     tbl.kb[v4].key = key
                 end,
@@ -2870,7 +2870,7 @@ do
                 end)
             end
             if not enabled4 then
-                option:AddButton({Name = "Настроить", Icon = "gear", Callback = fn69})
+                option:AddButton({Name = "Configure", Icon = "gear", Callback = fn69})
             end
         end
         function tbl.kbTglRow(v3, v4, v5, v6)

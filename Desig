@@ -807,7 +807,20 @@ do
             return {"Transparency"}
         end
     end
+    connection.FlinFadeStub = {
+        Tween = {
+            Completed = {
+                Connect = function(_, fn)
+                    task.defer(fn)
+                    return {Disconnect = function() end, Connected = false}
+                end,
+            },
+        },
+    }
     function connection.FadeItem(_, v6, v7, v8, time)
+        if time == 0 then
+            return connection.FlinFadeStub
+        end
         local v9 = v6[v7]
         v6[v7] = v8 and 1 or v9
         local create = tbl4.Create
@@ -1500,7 +1513,7 @@ do
         return item
     end
     function connection.Window(_, v6)
-        local FLIN_SIDEBAR_W = game:GetService("UserInputService").TouchEnabled and 136 or 196
+        local FLIN_SIDEBAR_W = game:GetService("UserInputService").TouchEnabled and 160 or 196
         local tbl7 = v6 or {}
         local tbl8 = {}
         tbl8.Logo = tbl7.Logo or tbl7.logo or "123748867365417"
@@ -1871,7 +1884,7 @@ do
             items.Search:AddToTheme({BackgroundColor3 = "Background", TextColor3 = "Text"})
             items.Search.Instance.AnchorPoint = Vector2.new(1, 0)
             items.Search.Instance.Position = newUDim2(1, -88, 0, 15)
-            items.Search.Instance.Size = newUDim2(0, 190, 0, 30)
+            items.Search.Instance.Size = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 140 or 200, 0, 30)
             tbl5:Create("UICorner", {Parent = items.Search.Instance, CornerRadius = newUDim(0, 4)})
             tbl5:Create("UIStroke", {Parent = items.Search.Instance, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
             tbl5:Create("UIPadding", {Parent = items.Search.Instance, PaddingLeft = newUDim(0, 8)})
@@ -3625,7 +3638,10 @@ local window = connection:Window({
     Logo = "F",
     FadeSpeed = 0,
     PagePadding = 6,
-    Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 520, 0, 430) or UDim2.new(0, 860, 0, 560),
+    Size = game:GetService("UserInputService").TouchEnabled and (function()
+        local vp = workspace.CurrentCamera.ViewportSize
+        return UDim2.new(0, math.clamp(math.floor(vp.X * 0.82), 560, 900), 0, math.clamp(math.floor(vp.Y * 0.88), 400, 640))
+    end)() or UDim2.new(0, 860, 0, 560),
 })
 tbl.Window = window
 pcall(function()
@@ -3771,7 +3787,7 @@ local FLIN_TAB_ICONS = {
     General = "house", MM2 = "sword", Visuals = "sun", Target = "crosshairs",
     Fun = "lightning-bolt", Emotes = "person-jumping", Sound = "speaker", Configs = "floppy-disk",
 }
-local function flinStyleTab(page, name)
+local function flinStyleTab(page, name, opts)
     pcall(function()
         local touch = game:GetService("UserInputService").TouchEnabled
         local btn = page.Items.Inactive.Instance
@@ -3781,6 +3797,15 @@ local function flinStyleTab(page, name)
         btn.TextXAlignment = Enum.TextXAlignment.Left
         btn.BackgroundColor3 = connection.Theme.Accent
         btn.BackgroundTransparency = 1
+        local hl = opts and opts.highlight
+        if opts and opts.emoji then
+            btn.FontFace = Font.fromEnum(Enum.Font.GothamBold)
+            btn.Text = opts.emoji
+            btn.TextSize = 18
+        end
+        if hl then
+            btn.BackgroundColor3 = hl
+        end
         local pad = Instance.new("UIPadding")
         pad.PaddingLeft = UDim.new(0, 12)
         pad.Parent = btn
@@ -3794,7 +3819,10 @@ local function flinStyleTab(page, name)
         lbl.Font = Enum.Font.GothamMedium
         lbl.TextSize = touch and 12 or 14
         lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.TextColor3 = connection.Theme.Text
+        lbl.TextColor3 = hl or connection.Theme.Text
+        if hl then
+            lbl.Font = Enum.Font.GothamBold
+        end
         lbl.Position = UDim2.new(0, 34, 0, 0)
         lbl.Size = UDim2.new(1, -34, 1, 0)
         lbl.ZIndex = btn.ZIndex + 1
@@ -3802,7 +3830,7 @@ local function flinStyleTab(page, name)
         local function sync()
             local active = btn.TextTransparency < 0.3
             lbl.TextTransparency = btn.TextTransparency
-            local want = active and 0.82 or 1
+            local want = hl and (active and 0.5 or 0.78) or (active and 0.82 or 1)
             if btn.BackgroundTransparency ~= want then
                 btn.BackgroundTransparency = want
             end
@@ -3822,6 +3850,7 @@ local function flinStyleTab(page, name)
         title.Position = UDim2.new(0, 20, 0, 15)
         title.Size = UDim2.new(1, -300, 0, 30)
         title.ZIndex = 4
+        title.Visible = not touch
         title.Parent = page.Items.PageContent.Instance
     end)
 end
@@ -3841,7 +3870,7 @@ function window:AddTab(item)
         v5.Items.Inactive.Instance.Size = UDim2.new(0, 64, 1, 0)
         v5.Items.Inactive.Instance.TextSize = 12
     end)
-    flinStyleTab(_firstMainPage, item.Name or "Tab")
+    flinStyleTab(_firstMainPage, item.Name or "Tab", item.FlinStyle)
     _firstMainPage.Items.Inactive.Instance.MouseButton1Down:Connect(function()
         for _, subPage in ipairs(self.SubPages) do
             if subPage.Page == _firstMainPage then
@@ -4156,16 +4185,42 @@ pcall(function()
         nm.BackgroundTransparency = 1
         nm.Text = game:GetService("Players").LocalPlayer.DisplayName
         nm.Font = Enum.Font.GothamMedium
-        nm.TextSize = 13
+        nm.TextScaled = true
+        nm.TextWrapped = false
         nm.TextColor3 = connection.Theme.Text
         nm.TextTransparency = 0.25
         nm.TextXAlignment = Enum.TextXAlignment.Left
-        nm.TextTruncate = Enum.TextTruncate.AtEnd
         nm.AnchorPoint = Vector2.new(0, 1)
         nm.Position = UDim2.new(0, 56, 1, -14)
         nm.Size = UDim2.new(1, -64, 0, 34)
         nm.ZIndex = 5
+        local cons = Instance.new("UITextSizeConstraint")
+        cons.MaxTextSize = 15
+        cons.MinTextSize = 8
+        cons.Parent = nm
         nm.Parent = sb
+        -- privacy: hide own name / avatar (menu + overhead name)
+        local realName, realImage = nm.Text, av.Image
+        local lp = game:GetService("Players").LocalPlayer
+        getgenv().Flin_HideIdentity = function(hide)
+            pcall(function()
+                nm.Text = hide and "Hidden" or realName
+                av.Image = hide and "" or realImage
+                av.BackgroundTransparency = hide and 0.6 or 1
+                local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum.DisplayDistanceType = hide and Enum.HumanoidDisplayDistanceType.None or Enum.HumanoidDisplayDistanceType.Viewer
+                end
+            end)
+        end
+        lp.CharacterAdded:Connect(function(char)
+            if getgenv().Flin_IdentityHidden then
+                local hum = char:WaitForChild("Humanoid", 10)
+                if hum then
+                    hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+                end
+            end
+        end)
     end
 end)
 -- ===== end FlinHUB shell =====
@@ -4199,6 +4254,9 @@ uiRefs.Settings = window.UserSettings
 tbl.Language = Flin_InterfaceLanguage == "Russian" and "Russian" or "English"
 tbl.TextMapRussian = {
     Configs = "Кфг",
+    ["Hide Name & Avatar"] = "Скрыть ник и аватар",
+    ["Candy Farm"] = "Конфеты",
+    ["Candy Auto Farm"] = "Авто фарм конфет",
     Settings = "Настройки",
     Language = "Язык",
     General = "Общее",
@@ -4237,7 +4295,7 @@ tbl.TextMapRussian = {
     AutoFarm = "Автофарм",
     Mode = "Режим",
     ["Tween Speed"] = "Скорость перемещения",
-    ["Coin Limit"] = "Лимит монет",
+    ["Candy Limit"] = "Лимит конфет",
     ["Max Distance"] = "Максимальная дистанция",
     ["Underground Offset"] = "Смещение под землёй",
     ["Gun Model"] = "Модель оружия",
@@ -4725,6 +4783,16 @@ end;
             end
         end,
     })
+    uiRefs.HideIdentity = uiRefs.Settings:AddLabel("Hide Name & Avatar"):AddToggle({
+        Default = false,
+        Flag = "HideIdentity",
+        Callback = function(hide)
+            getgenv().Flin_IdentityHidden = hide
+            if getgenv().Flin_HideIdentity then
+                getgenv().Flin_HideIdentity(hide)
+            end
+        end,
+    })
     fn62(value)
     if connection.ApplyTheme then
         local v5 = connection
@@ -4751,14 +4819,18 @@ pcall(function()
         local imageLabel = Instance.new("ImageLabel")
         imageLabel.Name = "GeneralIcon"
         imageLabel.BackgroundTransparency = 1
-        imageLabel.Size = UDim2.new(0, 25, 0, 25)
-        imageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-        imageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        imageLabel.Size = UDim2.new(0, 22, 0, 22)
+        imageLabel.Position = UDim2.new(0, 0, 0.5, 0)
+        imageLabel.AnchorPoint = Vector2.new(0, 0.5)
         imageLabel.Image = "rbxassetid://9562514785"
         imageLabel.ScaleType = Enum.ScaleType.Fit
         imageLabel.ImageColor3 = Color3.fromRGB(245, 242, 238)
         imageLabel.ZIndex = parent.ZIndex + 1
         imageLabel.Parent = parent
+        imageLabel.ImageTransparency = parent.TextTransparency
+        parent:GetPropertyChangedSignal("TextTransparency"):Connect(function()
+            imageLabel.ImageTransparency = parent.TextTransparency
+        end)
     end
 end);
 (function()
@@ -4926,6 +4998,11 @@ end);
                 end
                 Lighting.GlobalShadows = false
                 Lighting.FogEnd = 9000000000
+                pcall(function()
+                    if setfpscap then
+                        setfpscap(0)
+                    end
+                end)
                 pcall(function()
                     settings().Rendering.QualityLevel = 1
                 end)
@@ -6074,6 +6151,7 @@ end)();
 end)();
 (function()
     getfenv()
+    local farmTab = window:AddTab({Name = "Candy Farm", Icon = "star", FlinStyle = {emoji = "\240\159\141\172", highlight = Color3.fromRGB(255, 150, 40)}})
     local mM2Tab = window:AddTab({Name = "MM2", Icon = "crosshairs"})
     local eSPSection = mM2Tab:AddSection({Name = "ESP", Position = "left"})
     uiRefs.PlayersESP = tbl.kbTglRow(eSPSection, "PlayersESP", "Players", {
@@ -6791,7 +6869,19 @@ end)();
             end
         end,
     })
-    local autoFarmSection = mM2Tab:AddSection({Name = "AutoFarm", Position = "left"})
+    local autoFarmSection = farmTab:AddSection({Name = "Candy Auto Farm", Position = "left"})
+    pcall(function()
+        local sec = autoFarmSection.Items and autoFarmSection.Items.Section and autoFarmSection.Items.Section.Instance
+        if sec then
+            for _, child in ipairs(sec:GetChildren()) do
+                if child:IsA("UIStroke") then
+                    child.Color = Color3.fromRGB(255, 150, 40)
+                    child.Thickness = 2.5
+                end
+            end
+        end
+    end)
+    autoFarmSection:AddLabel("Collects Candy automatically")
     uiRefs.AutoFarm = tbl.kbTglRow(autoFarmSection, "AutoFarm", "Auto Farm", {
         Default = false,
         Callback = function(autoFarmEnabled)
@@ -6853,12 +6943,12 @@ end)();
             end
         end,
     });
-    (autoFarmSection:AddLabel("Coin Limit")):AddTextInput({
+    (autoFarmSection:AddLabel("Candy Limit")):AddTextInput({
         Default = tostring(AutoFarmSettings.CoinLimit),
         Placeholder = "40",
         Callback = function(value2)
             AutoFarmSettings.CoinLimit = tonumber(value2) or 40
-            tbl3.new({Title = "AutoFarm", Content = "Coin Limit → " .. AutoFarmSettings.CoinLimit, Duration = 2})
+            tbl3.new({Title = "AutoFarm", Content = "Candy Limit → " .. AutoFarmSettings.CoinLimit, Duration = 2})
         end,
     });
     (autoFarmSection:AddLabel("Max Distance")):AddTextInput({
@@ -9597,6 +9687,7 @@ pcall(function()
     screenGui.Destroying:Connect(function()
         hb:Disconnect()
     end)
+    local samples = {}
     task.spawn(function()
         while screenGui.Parent do
             local fps = frames
@@ -9605,7 +9696,15 @@ pcall(function()
             pcall(function()
                 local v = StatsSvc.Network.ServerStatsItem["Data Ping"]:GetValue()
                 if type(v) == "number" then
-                    ping = math.round(v)
+                    table.insert(samples, v)
+                    if #samples > 5 then
+                        table.remove(samples, 1)
+                    end
+                    local sum = 0
+                    for _, s in ipairs(samples) do
+                        sum = sum + s
+                    end
+                    ping = math.round(sum / #samples)
                 end
             end)
             fpsLabel.Text = fps .. " fps"

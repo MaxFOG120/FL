@@ -1500,12 +1500,13 @@ do
         return item
     end
     function connection.Window(_, v6)
+        local FLIN_SIDEBAR_W = game:GetService("UserInputService").TouchEnabled and 136 or 196
         local tbl7 = v6 or {}
         local tbl8 = {}
         tbl8.Logo = tbl7.Logo or tbl7.logo or "123748867365417"
         tbl8.Size = tbl7.Size or tbl7.size or newUDim2(0, 760, 0, 540)
         tbl8.FadeSpeed = tbl7.FadeSpeed or tbl7.fadespeed or 0.2
-        tbl8.PagePadding = tbl7.PagePadding or tbl7.pagepadding or 24
+        tbl8.PagePadding = tbl7.PagePadding or tbl7.pagepadding or 6
         tbl8.Pages = {}
         tbl8.SubPages = {}
         tbl8.Items = {}
@@ -1550,7 +1551,7 @@ do
             Parent = items.MainFrame.Instance,
             Name = "\000",
             BackgroundTransparency = 1,
-            Size = newUDim2(0, 86, 1, 0),
+            Size = newUDim2(0, FLIN_SIDEBAR_W, 1, 0),
             BorderColor3 = fromRGB(0, 0, 0),
             ZIndex = 2,
             BorderSizePixel = 0,
@@ -1617,8 +1618,8 @@ do
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             BackgroundTransparency = 1,
-            Position = newUDim2(0, 0, 0, 108),
-            Size = newUDim2(1, 0, 1, -134),
+            Position = newUDim2(0, 0, 0, 74),
+            Size = newUDim2(1, 0, 1, -140),
             ZIndex = 2,
             BorderSizePixel = 0,
             BackgroundColor3 = fromRGB(245, 242, 238),
@@ -1653,8 +1654,8 @@ do
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             BackgroundTransparency = 1,
-            Position = newUDim2(0, 87, 0, 0),
-            Size = newUDim2(1, -87, 1, 0),
+            Position = newUDim2(0, FLIN_SIDEBAR_W + 1, 0, 0),
+            Size = newUDim2(1, -(FLIN_SIDEBAR_W + 1), 1, 0),
             ZIndex = 2,
             ClipsDescendants = true,
             BorderSizePixel = 0,
@@ -1868,6 +1869,9 @@ do
                 BackgroundColor3 = fromRGB(10, 9, 8),
             })
             items.Search:AddToTheme({BackgroundColor3 = "Background", TextColor3 = "Text"})
+            items.Search.Instance.AnchorPoint = Vector2.new(1, 0)
+            items.Search.Instance.Position = newUDim2(1, -88, 0, 15)
+            items.Search.Instance.Size = newUDim2(0, 190, 0, 30)
             tbl5:Create("UICorner", {Parent = items.Search.Instance, CornerRadius = newUDim(0, 4)})
             tbl5:Create("UIStroke", {Parent = items.Search.Instance, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
             tbl5:Create("UIPadding", {Parent = items.Search.Instance, PaddingLeft = newUDim(0, 8)})
@@ -2048,6 +2052,7 @@ do
             BackgroundColor3 = fromRGB(245, 242, 238),
         })
         items.Right:AddToTheme({ScrollBarImageColor3 = "Accent"})
+        items.Right.Instance.Visible = false
         tbl5:Create("UIPadding", {
             Parent = items.Right.Instance,
             PaddingTop = newUDim(0, 12),
@@ -2070,7 +2075,7 @@ do
             Name = "\000",
             BackgroundTransparency = 1,
             Position = newUDim2(0, 0, 0, 2),
-            Size = newUDim2(0.5, -4, 1, -6),
+            Size = newUDim2(1, 0, 1, -6),
             BottomImage = connection:GetImage("Scrollbar"),
             TopImage = connection:GetImage("Scrollbar"),
             BackgroundColor3 = fromRGB(245, 242, 238),
@@ -2080,7 +2085,7 @@ do
             Parent = items.Left.Instance,
             PaddingTop = newUDim(0, 12),
             PaddingBottom = newUDim(0, 14),
-            PaddingRight = newUDim(0, 7),
+            PaddingRight = newUDim(0, 14),
             PaddingLeft = newUDim(0, 14),
         })
         tbl5:Create("UIListLayout", {Parent = items.Left.Instance, Padding = newUDim(0, 14), SortOrder = Enum.SortOrder.LayoutOrder})
@@ -2186,7 +2191,7 @@ do
         }
         local items = {}
         items.Section = tbl5:Create("Frame", {
-            Parent = item2.Side:lower() == "left" and item2.Page.Items.Left.Instance or item2.Page.Items.Right.Instance,
+            Parent = item2.Page.Items.Left.Instance,
             BorderSizePixel = 0,
             Name = "\000",
             Size = newUDim2(1, 0, 0, 45),
@@ -3619,8 +3624,8 @@ end
 local window = connection:Window({
     Logo = "F",
     FadeSpeed = 0,
-    PagePadding = 24,
-    Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 440, 0, 470) or UDim2.new(0, 840, 0, 560),
+    PagePadding = 6,
+    Size = game:GetService("UserInputService").TouchEnabled and UDim2.new(0, 520, 0, 430) or UDim2.new(0, 860, 0, 560),
 })
 tbl.Window = window
 pcall(function()
@@ -3762,12 +3767,70 @@ function window:SetSize(v5)
         end
     end
 end
+local FLIN_TAB_ICONS = {
+    General = "house", MM2 = "sword", Visuals = "sun", Target = "crosshairs",
+    Fun = "lightning-bolt", Emotes = "person-jumping", Sound = "speaker", Configs = "floppy-disk",
+}
+local function flinStyleTab(page, name)
+    pcall(function()
+        local touch = game:GetService("UserInputService").TouchEnabled
+        local btn = page.Items.Inactive.Instance
+        btn.AnchorPoint = Vector2.new(0, 0)
+        btn.Size = UDim2.new(1, -20, 0, touch and 34 or 38)
+        btn.TextSize = 20
+        btn.TextXAlignment = Enum.TextXAlignment.Left
+        btn.BackgroundColor3 = connection.Theme.Accent
+        btn.BackgroundTransparency = 1
+        local pad = Instance.new("UIPadding")
+        pad.PaddingLeft = UDim.new(0, 12)
+        pad.Parent = btn
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = btn
+        local lbl = Instance.new("TextLabel")
+        lbl.Name = "FlinTabName"
+        lbl.BackgroundTransparency = 1
+        lbl.Text = name
+        lbl.Font = Enum.Font.GothamMedium
+        lbl.TextSize = touch and 12 or 14
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.TextColor3 = connection.Theme.Text
+        lbl.Position = UDim2.new(0, 34, 0, 0)
+        lbl.Size = UDim2.new(1, -34, 1, 0)
+        lbl.ZIndex = btn.ZIndex + 1
+        lbl.Parent = btn
+        local function sync()
+            local active = btn.TextTransparency < 0.3
+            lbl.TextTransparency = btn.TextTransparency
+            local want = active and 0.82 or 1
+            if btn.BackgroundTransparency ~= want then
+                btn.BackgroundTransparency = want
+            end
+        end
+        btn:GetPropertyChangedSignal("TextTransparency"):Connect(sync)
+        btn:GetPropertyChangedSignal("BackgroundTransparency"):Connect(sync)
+        sync()
+        -- page title in the header (left of the search box)
+        local title = Instance.new("TextLabel")
+        title.Name = "FlinTitle"
+        title.BackgroundTransparency = 1
+        title.Text = name
+        title.Font = Enum.Font.GothamBold
+        title.TextSize = touch and 17 or 22
+        title.TextXAlignment = Enum.TextXAlignment.Left
+        title.TextColor3 = connection.Theme.Text
+        title.Position = UDim2.new(0, 20, 0, 15)
+        title.Size = UDim2.new(1, -300, 0, 30)
+        title.ZIndex = 4
+        title.Parent = page.Items.PageContent.Instance
+    end)
+end
 function window:AddTab(item)
     if not item then
         item = {}
     end
     local _firstMainPage = self:Page({
-        Icon = item.Icon or "gear",
+        Icon = FLIN_TAB_ICONS[item.Name or ""] or item.Icon or "gear",
         Search = item.Search ~= false,
         Sidebar = item.Sidebar == true,
         LayoutOrder = item.LayoutOrder or 0,
@@ -3778,6 +3841,7 @@ function window:AddTab(item)
         v5.Items.Inactive.Instance.Size = UDim2.new(0, 64, 1, 0)
         v5.Items.Inactive.Instance.TextSize = 12
     end)
+    flinStyleTab(_firstMainPage, item.Name or "Tab")
     _firstMainPage.Items.Inactive.Instance.MouseButton1Down:Connect(function()
         for _, subPage in ipairs(self.SubPages) do
             if subPage.Page == _firstMainPage then
@@ -4051,6 +4115,58 @@ pcall(function()
     window.Signal:Connect(function(open)
         if open then pill.Visible = false end
     end)
+end)
+pcall(function()
+    local touch = game:GetService("UserInputService").TouchEnabled
+    local sb = window.Items.Sidebar.Instance
+    local mark = sb:FindFirstChild("FlinAvatar")
+    if mark then
+        mark.AnchorPoint = Vector2.new(0, 0)
+        mark.Position = UDim2.fromOffset(14, 12)
+        mark.Size = UDim2.fromOffset(touch and 38 or 44, touch and 38 or 44)
+    end
+    local textX = touch and 58 or 66
+    local wm = sb:FindFirstChild("FlinHubWordmark")
+    if wm then
+        wm.Text = "FlinHUB"
+        wm.TextXAlignment = Enum.TextXAlignment.Left
+        wm.TextSize = touch and 15 or 18
+        wm.Position = UDim2.fromOffset(textX, 13)
+        wm.Size = UDim2.new(1, -textX - 4, 0, 20)
+    end
+    local ver = Instance.new("TextLabel")
+    ver.Name = "FlinVersion"
+    ver.BackgroundTransparency = 1
+    ver.Text = "v1.0"
+    ver.Font = Enum.Font.Gotham
+    ver.TextSize = 12
+    ver.TextTransparency = 0.4
+    ver.TextColor3 = connection.Theme.Text
+    ver.TextXAlignment = Enum.TextXAlignment.Left
+    ver.Position = UDim2.fromOffset(textX, 34)
+    ver.Size = UDim2.new(1, -textX - 4, 0, 16)
+    ver.ZIndex = 5
+    ver.Parent = sb
+    local av = window.Items.Avatar and window.Items.Avatar.Instance
+    if av then
+        av.AnchorPoint = Vector2.new(0, 1)
+        av.Position = UDim2.new(0, 14, 1, -14)
+        local nm = Instance.new("TextLabel")
+        nm.Name = "FlinPlayerName"
+        nm.BackgroundTransparency = 1
+        nm.Text = game:GetService("Players").LocalPlayer.DisplayName
+        nm.Font = Enum.Font.GothamMedium
+        nm.TextSize = 13
+        nm.TextColor3 = connection.Theme.Text
+        nm.TextTransparency = 0.25
+        nm.TextXAlignment = Enum.TextXAlignment.Left
+        nm.TextTruncate = Enum.TextTruncate.AtEnd
+        nm.AnchorPoint = Vector2.new(0, 1)
+        nm.Position = UDim2.new(0, 56, 1, -14)
+        nm.Size = UDim2.new(1, -64, 0, 34)
+        nm.ZIndex = 5
+        nm.Parent = sb
+    end
 end)
 -- ===== end FlinHUB shell =====
 menuBlurEnabled = false

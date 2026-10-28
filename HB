@@ -425,7 +425,15 @@ pcall(function()
             end)
         end
     end)
-    RunService.Heartbeat:Connect(fn50)
+    local fogNext = 0
+    RunService.Heartbeat:Connect(function()
+        local t = os.clock()
+        if t < fogNext then
+            return
+        end
+        fogNext = t + 0.25
+        fn50()
+    end)
 end)
 VirtualInputManager = game:GetService("VirtualInputManager")
 LP = Players.LocalPlayer
@@ -8249,11 +8257,25 @@ end
 
 -- Дизайн загружается только по RAW-ссылке DESIGN_URL.
 local designSource
-local okHttp, remoteSource = pcall(function()
-    return game:HttpGet(DESIGN_URL)
-end)
-if okHttp and type(remoteSource) == "string" and #remoteSource > 0 then
-    designSource = remoteSource
+local remoteSource
+for _, path in ipairs({"FlinHUB/FlinDesign.lua", "FlinDesign.lua"}) do
+    if not designSource and type(isfile) == "function" and type(readfile) == "function" then
+        local okLocal, localSource = pcall(function()
+            return isfile(path) and readfile(path) or nil
+        end)
+        if okLocal and type(localSource) == "string" and #localSource > 0 then
+            designSource = localSource
+        end
+    end
+end
+if not designSource then
+    local okHttp
+    okHttp, remoteSource = pcall(function()
+        return game:HttpGet(DESIGN_URL)
+    end)
+    if okHttp and type(remoteSource) == "string" and #remoteSource > 0 then
+        designSource = remoteSource
+    end
 end
 
 if not designSource then

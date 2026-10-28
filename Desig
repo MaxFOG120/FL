@@ -1659,7 +1659,7 @@ do
             BorderSizePixel = 0,
             BackgroundColor3 = fromRGB(245, 242, 238),
         })
-        items.Avatar.Instance.Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+        items.Avatar.Instance.Image = "rbxthumb://type=AvatarHeadShot&id=" .. Players.LocalPlayer.UserId .. "&w=150&h=150"
         tbl5:Create("UICorner", {Parent = items.Avatar.Instance, CornerRadius = newUDim(1, 0)})
         tbl5:Create("UIStroke", {Parent = items.Avatar.Instance, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
         items.Inline = tbl5:Create("Frame", {
@@ -3640,8 +3640,10 @@ local window = connection:Window({
     PagePadding = 6,
     Size = game:GetService("UserInputService").TouchEnabled and (function()
         local vp = workspace.CurrentCamera.ViewportSize
-        return UDim2.new(0, math.clamp(math.floor(vp.X * 0.82), 560, 900), 0, math.clamp(math.floor(vp.Y * 0.88), 400, 640))
-    end)() or UDim2.new(0, 860, 0, 560),
+        local w = math.clamp(math.floor(vp.X * 0.9), 620, 1000)
+        local h = math.clamp(math.floor(math.min(vp.Y * 0.8, w * 0.56)), 340, 560)
+        return UDim2.new(0, w, 0, h)
+    end)() or UDim2.new(0, 960, 0, 540),
 })
 tbl.Window = window
 pcall(function()
@@ -4743,7 +4745,7 @@ end;
                 connection.MenuKeybind = menuKeybind.Key
                 tbl3.new({
                     Title = "Settings",
-                    Content = "Клавиша меню: " .. string.gsub(tostring(menuKeybind.Key), "Enum%.[%w]+%.", ""),
+                    Content = "Menu key: " .. string.gsub(tostring(menuKeybind.Key), "Enum%.[%w]+%.", ""),
                     Duration = 3,
                 })
             end
@@ -4755,7 +4757,7 @@ end;
         Callback = function(value2)
             if tbl5[value2] then
                 window:SetSize(tbl5[value2])
-                tbl3.new({Title = "Settings", Content = "Размер меню: " .. tostring(value2), Duration = 3})
+                tbl3.new({Title = "Settings", Content = "Menu scale: " .. tostring(value2), Duration = 3})
             end
         end,
     })
@@ -5157,7 +5159,9 @@ end)();
             end
         end
     end
+    local ghostWarned = false
     RunService.RenderStepped:Connect(function()
+      local okGhost, errGhost = pcall(function()
         if not tbl.ghostOn then
             if instance2 then
                 fn63()
@@ -5174,6 +5178,16 @@ end)();
                     instance2 = character:Clone()
                     instance2.Name = "ClientGhost"
                     instance2.Parent = folder
+                    pcall(function()
+                        local hl = Instance.new("Highlight")
+                        hl.FillColor = tbl6.Color
+                        hl.FillTransparency = 0.55
+                        hl.OutlineColor = Color3.new(1, 1, 1)
+                        hl.OutlineTransparency = 0.2
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Adornee = instance2
+                        hl.Parent = instance2
+                    end)
                     list3 = {}
                     local humanoid = instance2:FindFirstChildOfClass("Humanoid")
                     if humanoid then
@@ -5238,7 +5252,7 @@ end)();
                 pcall(function()
                     n3 = Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
                 end)
-                local value2 = tick() - math.clamp(n3 / 1000, 0, 2)
+                local value2 = tick() - math.clamp(n3 / 1000, 0.12, 2)
                 local v6 = list4[#list4]
                 local list5 = list4
                 local count2 = #list5
@@ -5275,6 +5289,11 @@ end)();
                 end
             end
         end
+      end)
+      if not okGhost and not ghostWarned then
+        ghostWarned = true
+        warn("[FlinHUB] Client Ghost error: " .. tostring(errGhost))
+      end
     end)
 end)();
 (function()
@@ -8746,7 +8765,7 @@ end)();
         Callback = function(value2)
             local resolution = tonumber(value2)
             if not resolution then
-                tbl3.new({Title = "AspectRatio", Content = "Введи число!", Duration = 2})
+                tbl3.new({Title = "AspectRatio", Content = "Enter a number!", Duration = 2})
             else
                 aspectRatioScale = resolution
                 getgenv().Resolution = resolution

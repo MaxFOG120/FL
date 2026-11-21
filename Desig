@@ -7,7 +7,7 @@ FlinHUB.lua загружает этот файл как Lua-модуль и со
 Не удаляй строки-маркеры и не запускай этот файл отдельно.
 ]]
 local FlinDesign = {
-    Version = "FlinDesign / FlinHUB 1.0",
+    Version = "FlinDesign / FlinHUB 2.0",
     Core = [========================================[
 local function forEachYield(iterator, state, control)
     local yield = coroutine.yield

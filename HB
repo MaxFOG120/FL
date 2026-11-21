@@ -4,7 +4,7 @@ FLINHUB · объединённый игровой скрипт
 Запускай FlinHUB.lua. Для будущего Discord-инвайта заполни DISCORD_INVITE_URL ниже.
 ]]
 -- RAW-ссылка на FlinDesign.lua (Pastebin). Дизайн грузится только отсюда.
-local DESIGN_URL = "https://raw.githubusercontent.com/MaxFOG120/FL/refs/heads/main/Desig"
+local DESIGN_URL = "https://raw.githubusercontent.com/MaxFOG120/FL/refs/heads/main/FlinDesign.lua"
 
 -- Пока Discord-сервер не создан, оставь строку пустой.
 -- Когда появится приглашение, вставь его сюда — ссылка будет копироваться при запуске.
@@ -1655,7 +1655,7 @@ do
                             if customGunModel then
                                 customGunModel:Destroy()
                             end
-                            local instance = fn64(v2.id)
+                            local instance = v2 and v2.id and fn64(v2.id)
                             if instance then
                                 instance.Name = "CustomGunModel"
                                 for _, descendant in ipairs(parent:GetDescendants()) do
@@ -8249,15 +8249,31 @@ end
 
 -- Дизайн загружается только по RAW-ссылке DESIGN_URL.
 local designSource
-local okHttp, remoteSource = pcall(function()
-    return game:HttpGet(DESIGN_URL)
-end)
-if okHttp and type(remoteSource) == "string" and #remoteSource > 0 then
-    designSource = remoteSource
+-- 1) локальный FlinDesign.lua (папка workspace executor'а)
+if type(readfile) == "function" and type(isfile) == "function" then
+    local okLocal, localSource = pcall(function()
+        if isfile("FlinDesign.lua") then
+            return readfile("FlinDesign.lua")
+        end
+    end)
+    if okLocal and type(localSource) == "string" and #localSource > 0 then
+        designSource = localSource
+    end
+end
+-- 2) RAW-ссылка
+local remoteSource
+if not designSource then
+    local okHttp
+    okHttp, remoteSource = pcall(function()
+        return game:HttpGet(DESIGN_URL)
+    end)
+    if okHttp and type(remoteSource) == "string" and #remoteSource > 0 and not remoteSource:find("^404") then
+        designSource = remoteSource
+    end
 end
 
 if not designSource then
-    fail("Не удалось загрузить FlinDesign по ссылке " .. DESIGN_URL .. " (" .. tostring(remoteSource) .. "). Проверь ссылку и интернет.")
+    fail("Не удалось загрузить FlinDesign (RAW: " .. DESIGN_URL .. ", ответ: " .. tostring(remoteSource) .. "). Положи FlinDesign.lua в workspace executor'а или проверь ссылку.")
 end
 
 -- Inter/InterBold не используются ядром (ниже уже заданы встроенные Gotham-шрифты).
@@ -8282,11 +8298,7 @@ local runChunk, compileError = loadstring(mergedSource, "@FlinHUB_Merged.lua")
 if not runChunk then
     fail("Объединённый скрипт не компилируется: " .. tostring(compileError))
 end
-local okRun, runErr = xpcall(runChunk, function(err)
-    return tostring(err) .. "\n" .. (debug and debug.traceback and debug.traceback("", 2) or "")
-end)
+local okRun, runErr = xpcall(runChunk, debug.traceback)
 if not okRun then
-    warn("[FlinHUB] Ошибка запуска: " .. tostring(runErr))
-    error(runErr, 0)
+    fail("Ошибка при запуске: " .. tostring(runErr))
 end
-return runErr

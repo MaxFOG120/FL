@@ -7,7 +7,7 @@ FlinHUB.lua загружает этот файл как Lua-модуль и со
 Не удаляй строки-маркеры и не запускай этот файл отдельно.
 ]]
 local FlinDesign = {
-    Version = "FlinDesign / FlinHUB 2.0",
+    Version = "FlinDesign / FlinHUB 1.0",
     Core = [========================================[
 local function forEachYield(iterator, state, control)
     local yield = coroutine.yield
@@ -1505,7 +1505,7 @@ do
         tbl8.Logo = tbl7.Logo or tbl7.logo or "123748867365417"
         tbl8.Size = tbl7.Size or tbl7.size or newUDim2(0, 760, 0, 540)
         tbl8.FadeSpeed = tbl7.FadeSpeed or tbl7.fadespeed or 0.2
-        tbl8.PagePadding = tbl7.PagePadding or tbl7.pagepadding or 19
+        tbl8.PagePadding = tbl7.PagePadding or tbl7.pagepadding or 4
         tbl8.Pages = {}
         tbl8.SubPages = {}
         tbl8.Items = {}
@@ -1550,50 +1550,35 @@ do
             Parent = items.MainFrame.Instance,
             Name = "\000",
             BackgroundTransparency = 1,
-            Size = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 78 or 176, 1, 0),
+            Size = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 64 or 196, 1, 0),
             BorderColor3 = fromRGB(0, 0, 0),
             ZIndex = 2,
             BorderSizePixel = 0,
-            BackgroundColor3 = fromRGB(245, 242, 238),
+            BackgroundTransparency = 0,
+            BackgroundColor3 = fromRGB(30, 30, 34),
         })
+        items.Sidebar:AddToTheme({BackgroundColor3 = "Inline"})
         -- FlinHUB mark: a clean monochrome F instead of an unrelated image asset.
         items.Logo = tbl5:Create("TextLabel", {
             Parent = items.Sidebar.Instance,
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "FlinMark",
-            Size = newUDim2(0, 45, 0, 45),
-            AnchorPoint = Vector2.new(0.5, 0),
+            Size = newUDim2(0, 38, 0, 38),
+            AnchorPoint = Vector2.new(0, 0),
             Text = "F",
             FontFace = connection.BoldFont,
-            TextSize = 34,
+            TextSize = 22,
             TextXAlignment = Enum.TextXAlignment.Center,
             TextYAlignment = Enum.TextYAlignment.Center,
-            TextColor3 = fromRGB(245, 245, 248),
-            BackgroundTransparency = 1,
-            Position = newUDim2(0.5, 0, 0, 12),
+            TextColor3 = fromRGB(24, 24, 27),
+            BackgroundTransparency = 0,
+            Position = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 13 or 16, 0, 16),
             ZIndex = 3,
             BorderSizePixel = 0,
-            BackgroundColor3 = fromRGB(245, 245, 248),
+            BackgroundColor3 = fromRGB(170, 170, 180),
         })
-        items.Logo:AddToTheme({TextColor3 = "Image"})
-        items.Shadow2 = tbl5:Create("ImageLabel", {
-            Parent = items.Logo.Instance,
-            ScaleType = Enum.ScaleType.Slice,
-            Name = "\000",
-            ImageTransparency = 0.62,
-            BorderColor3 = fromRGB(0, 0, 0),
-            BackgroundColor3 = fromRGB(245, 242, 238),
-            Size = newUDim2(1, 5, 1, 24),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Image = "rbxassetid://112971167999062",
-            BackgroundTransparency = 1,
-            Position = newUDim2(0.5, 0, 0.5, 0),
-            SliceScale = 0.8999999761581421,
-            ZIndex = 2,
-            BorderSizePixel = 0,
-            SliceCenter = newRect(Vector2.new(112, 112), (Vector2.new(147, 147))),
-        })
-        items.Shadow2:AddToTheme({ImageColor3 = "Image"})
+        items.Logo:AddToTheme({TextColor3 = "Background", BackgroundColor3 = "Accent"})
+        tbl5:Create("UICorner", {Parent = items.Logo.Instance, CornerRadius = newUDim(0, 10)})
         tbl5:Create("Frame", {
             Parent = items.Sidebar.Instance,
             Size = newUDim2(0, 1, 1, 0),
@@ -1617,8 +1602,8 @@ do
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             BackgroundTransparency = 1,
-            Position = newUDim2(0, 0, 0, 104),
-            Size = newUDim2(1, 0, 1, -130),
+            Position = newUDim2(0, 0, 0, 74),
+            Size = newUDim2(1, 0, 1, -140),
             ZIndex = 2,
             BorderSizePixel = 0,
             BackgroundColor3 = fromRGB(245, 242, 238),
@@ -1630,17 +1615,18 @@ do
             HorizontalAlignment = Enum.HorizontalAlignment.Center,
             SortOrder = Enum.SortOrder.LayoutOrder,
         })
-        tbl5:Create("UICorner", {Parent = items.MainFrame.Instance, CornerRadius = newUDim(0, 10)})
+        tbl5:Create("UICorner", {Parent = items.MainFrame.Instance, CornerRadius = newUDim(0, 14)})
+        tbl5:Create("UIPadding", {Parent = items.Pages.Instance, PaddingLeft = newUDim(0, 10), PaddingRight = newUDim(0, 10), PaddingTop = newUDim(0, 2)})
         items.Avatar = tbl5:Create("ImageLabel", {
             Parent = items.Sidebar.Instance,
             ScaleType = Enum.ScaleType.Fit,
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             Size = newUDim2(0, 34, 0, 34),
-            AnchorPoint = Vector2.new(0.5, 1),
+            AnchorPoint = Vector2.new(0, 1),
             Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
             BackgroundTransparency = 1,
-            Position = newUDim2(0.5, 0, 1, -18),
+            Position = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 15 or 16, 1, -16),
             ZIndex = 2,
             BorderSizePixel = 0,
             BackgroundColor3 = fromRGB(245, 242, 238),
@@ -1648,13 +1634,33 @@ do
         items.Avatar.Instance.Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
         tbl5:Create("UICorner", {Parent = items.Avatar.Instance, CornerRadius = newUDim(1, 0)})
         tbl5:Create("UIStroke", {Parent = items.Avatar.Instance, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
+        if not game:GetService("UserInputService").TouchEnabled then
+            items.PlayerName = tbl5:Create("TextLabel", {
+                Parent = items.Sidebar.Instance,
+                Name = "\000",
+                BackgroundTransparency = 1,
+                FontFace = connection.Font,
+                Text = Players.LocalPlayer.DisplayName,
+                TextSize = 13,
+                TextTransparency = 0.25,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTruncate = Enum.TextTruncate.AtEnd,
+                TextColor3 = fromRGB(238, 238, 242),
+                AnchorPoint = Vector2.new(0, 1),
+                Position = newUDim2(0, 58, 1, -16),
+                Size = newUDim2(1, -70, 0, 34),
+                ZIndex = 3,
+                BorderSizePixel = 0,
+            })
+            items.PlayerName:AddToTheme({TextColor3 = "Text"})
+        end
         items.Inline = tbl5:Create("Frame", {
             Parent = items.MainFrame.Instance,
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             BackgroundTransparency = 1,
-            Position = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 79 or 177, 0, 0),
-            Size = newUDim2(1, game:GetService("UserInputService").TouchEnabled and -79 or -177, 1, 0),
+            Position = newUDim2(0, game:GetService("UserInputService").TouchEnabled and 65 or 197, 0, 0),
+            Size = newUDim2(1, game:GetService("UserInputService").TouchEnabled and -65 or -197, 1, 0),
             ZIndex = 2,
             ClipsDescendants = true,
             BorderSizePixel = 0,
@@ -1771,14 +1777,16 @@ do
         tbl8.Items = {}
         tbl8.Active = false
         local items = {}
+        local touch = game:GetService("UserInputService").TouchEnabled
+        tbl8.Name = tbl7.Name or tbl7.name or ""
         items.Inactive = tbl5:Create("TextButton", {
             Parent = sidebar and tbl8.Window.Items.Sidebar.Instance or tbl8.Window.Items.Pages.Instance,
             FontFace = connection.IconFont,
             Text = tbl8.Icon,
-            TextColor3 = fromRGB(245, 242, 238),
-            TextTransparency = 0.5,
-            TextSize = 20,
-            TextXAlignment = Enum.TextXAlignment.Center,
+            TextColor3 = fromRGB(238, 238, 242),
+            TextTransparency = 0.45,
+            TextSize = 18,
+            TextXAlignment = touch and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Center,
             BorderColor3 = fromRGB(0, 0, 0),
             AutoButtonColor = false,
@@ -1787,12 +1795,46 @@ do
             AnchorPoint = sidebar and Vector2.new(0.5, 0) or Vector2.new(0, 0),
             Position = sidebar and newUDim2(0.5, 0, 0, 68) or newUDim2(),
             BackgroundTransparency = 1,
-            Size = newUDim2(0, 25, 0, 25),
+            Size = newUDim2(1, 0, 0, 38),
             ZIndex = 2,
             BorderSizePixel = 0,
-            BackgroundColor3 = fromRGB(245, 242, 238),
+            BackgroundColor3 = fromRGB(34, 34, 39),
         })
-        items.Inactive:AddToTheme({TextColor3 = "Image"})
+        items.Inactive:AddToTheme({TextColor3 = "Image", BackgroundColor3 = "Element"})
+        tbl5:Create("UICorner", {Parent = items.Inactive.Instance, CornerRadius = newUDim(0, 10)})
+        if not touch then
+            tbl5:Create("UIPadding", {Parent = items.Inactive.Instance, PaddingLeft = newUDim(0, 12)})
+        end
+        items.Label = tbl5:Create("TextLabel", {
+            Parent = items.Inactive.Instance,
+            Name = "\000",
+            BackgroundTransparency = 1,
+            FontFace = connection.Font,
+            Text = tbl8.Name,
+            Visible = not touch and tbl8.Name ~= "",
+            TextSize = 14,
+            TextTransparency = 0.45,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextColor3 = fromRGB(238, 238, 242),
+            Position = newUDim2(0, 32, 0, 0),
+            Size = newUDim2(1, -32, 1, 0),
+            ZIndex = 3,
+            BorderSizePixel = 0,
+        })
+        items.Label:AddToTheme({TextColor3 = "Text"})
+        items.Bar = tbl5:Create("Frame", {
+            Parent = items.Inactive.Instance,
+            Name = "\000",
+            AnchorPoint = Vector2.new(0, 0.5),
+            Position = newUDim2(0, touch and 0 or -12, 0.5, 0),
+            Size = newUDim2(0, 3, 0, 16),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ZIndex = 4,
+            BackgroundColor3 = fromRGB(170, 170, 180),
+        })
+        items.Bar:AddToTheme({BackgroundColor3 = "Accent"})
+        tbl5:Create("UICorner", {Parent = items.Bar.Instance, CornerRadius = newUDim(1, 0)})
         items.PageContent = tbl5:Create("Frame", {
             Parent = tbl8.Window.Items.Inline.Instance,
             Name = "\000",
@@ -1855,22 +1897,22 @@ do
                 PlaceholderColor3 = fromRGB(175, 175, 175),
                 ZIndex = 2,
                 TextSize = 14,
-                Size = newUDim2(0, 313, 0, 30),
+                Size = newUDim2(1, -110, 0, 32),
                 TextColor3 = fromRGB(245, 242, 238),
                 BorderColor3 = fromRGB(0, 0, 0),
                 Text = "",
                 Name = "\000",
-                PlaceholderText = "Search",
-                Position = newUDim2(0, 15, 0, 15),
+                PlaceholderText = "Search settings...",
+                Position = newUDim2(0, 15, 0, 14),
                 TextXAlignment = Enum.TextXAlignment.Left,
                 CursorPosition = -1,
                 BorderSizePixel = 0,
                 BackgroundColor3 = fromRGB(10, 9, 8),
             })
-            items.Search:AddToTheme({BackgroundColor3 = "Background", TextColor3 = "Text"})
-            tbl5:Create("UICorner", {Parent = items.Search.Instance, CornerRadius = newUDim(0, 4)})
+            items.Search:AddToTheme({BackgroundColor3 = "Element", TextColor3 = "Text"})
+            tbl5:Create("UICorner", {Parent = items.Search.Instance, CornerRadius = newUDim(0, 10)})
             tbl5:Create("UIStroke", {Parent = items.Search.Instance, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
-            tbl5:Create("UIPadding", {Parent = items.Search.Instance, PaddingLeft = newUDim(0, 8)})
+            tbl5:Create("UIPadding", {Parent = items.Search.Instance, PaddingLeft = newUDim(0, 12)})
         end
         local enabled3 = false
         function tbl8.Turn(_, visible)
@@ -1880,9 +1922,13 @@ do
                 if visible then
                     items.PageContent.Instance.Visible = true
                     items.PageContent.Instance.Parent = tbl8.Window.Items.Inline.Instance
-                    items.Inactive:Tween(nil, {TextTransparency = 0})
+                    items.Inactive:Tween(nil, {TextTransparency = 0, BackgroundTransparency = 0})
+                    items.Label:Tween(nil, {TextTransparency = 0})
+                    items.Bar:Tween(nil, {BackgroundTransparency = 0})
                 else
-                    items.Inactive:Tween(nil, {TextTransparency = 0.5})
+                    items.Inactive:Tween(nil, {TextTransparency = 0.45, BackgroundTransparency = 1})
+                    items.Label:Tween(nil, {TextTransparency = 0.45})
+                    items.Bar:Tween(nil, {BackgroundTransparency = 1})
                 end
                 if SubPage and SubPage.NoFade then
                     items.PageContent.Instance.Visible = visible
@@ -2193,11 +2239,11 @@ do
             BorderColor3 = fromRGB(0, 0, 0),
             ZIndex = 4,
             AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundTransparency = 0.45,
-            BackgroundColor3 = fromRGB(10, 9, 8),
+            BackgroundTransparency = 0,
+            BackgroundColor3 = fromRGB(30, 30, 34),
         })
-        items.Section:AddToTheme({BackgroundColor3 = "Background"})
-        tbl5:Create("UIStroke", {Parent = items.Section.Instance, Thickness = 1.5, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
+        items.Section:AddToTheme({BackgroundColor3 = "Inline"})
+        tbl5:Create("UIStroke", {Parent = items.Section.Instance, Thickness = 1, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border}):AddToTheme({Color = "Border"})
         items.Text = tbl5:Create("TextLabel", {
             Parent = items.Section.Instance,
             FontFace = connection.BoldFont,
@@ -2209,17 +2255,17 @@ do
             Size = newUDim2(1, 0, 0, 15),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Position = newUDim2(0, 7, 0, 6),
+            Position = newUDim2(0, 14, 0, 8),
             ZIndex = 4,
-            TextSize = 14,
+            TextSize = 15,
             BackgroundColor3 = fromRGB(245, 242, 238),
         })
         items.Text:AddToTheme({TextColor3 = "Text"})
         tbl5:Create("Frame", {
             Parent = items.Section.Instance,
-            Size = newUDim2(1, 0, 0, 1),
+            Size = newUDim2(1, -28, 0, 1),
             Name = "\000",
-            Position = newUDim2(0, 0, 0, 27),
+            Position = newUDim2(0, 14, 0, 33),
             BorderColor3 = fromRGB(0, 0, 0),
             ZIndex = 4,
             BorderSizePixel = 0,
@@ -2230,15 +2276,15 @@ do
             BorderColor3 = fromRGB(0, 0, 0),
             Name = "\000",
             BackgroundTransparency = 1,
-            Position = newUDim2(0, 10, 0, 38),
-            Size = newUDim2(1, -20, 0, 0),
+            Position = newUDim2(0, 14, 0, 44),
+            Size = newUDim2(1, -28, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundColor3 = fromRGB(245, 242, 238),
         })
-        tbl5:Create("UIListLayout", {Parent = items.Content.Instance, Padding = newUDim(0, 7), SortOrder = Enum.SortOrder.LayoutOrder})
-        tbl5:Create("UIPadding", {Parent = items.Section.Instance, PaddingBottom = newUDim(0, 12)})
-        tbl5:Create("UICorner", {Parent = items.Section.Instance, CornerRadius = newUDim(0, 10)})
+        tbl5:Create("UIListLayout", {Parent = items.Content.Instance, Padding = newUDim(0, 10), SortOrder = Enum.SortOrder.LayoutOrder})
+        tbl5:Create("UIPadding", {Parent = items.Section.Instance, PaddingBottom = newUDim(0, 14)})
+        tbl5:Create("UICorner", {Parent = items.Section.Instance, CornerRadius = newUDim(0, 12)})
         function item2.SetVisibility(_, visible)
             items.Section.Instance.Visible = visible
         end
@@ -2269,7 +2315,7 @@ do
             Name = "\000",
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Size = newUDim2(1, 0, 0, 15),
+            Size = newUDim2(1, 0, 0, 20),
             ZIndex = 4,
             TextSize = 14,
             BackgroundColor3 = fromRGB(245, 242, 238),
@@ -2280,7 +2326,7 @@ do
             AnchorPoint = Vector2.new(1, 0.5),
             Name = "\000",
             Position = newUDim2(1, 0, 0.5, 0),
-            Size = newUDim2(0, 30, 0, 16),
+            Size = newUDim2(0, 36, 0, 20),
             ZIndex = 5,
             BorderSizePixel = 0,
             BackgroundColor3 = fromRGB(15, 13, 11),
@@ -2289,17 +2335,17 @@ do
         tbl7.Knob = tbl5:Create("Frame", {
             Parent = tbl7.Indicator.Instance,
             AnchorPoint = Vector2.new(0, 0.5),
-            Position = newUDim2(0, 2, 0.5, 0),
-            Size = newUDim2(0, 12, 0, 12),
+            Position = newUDim2(0, 3, 0.5, 0),
+            Size = newUDim2(0, 14, 0, 14),
             BorderSizePixel = 0,
             BackgroundColor3 = fromRGB(245, 242, 238),
             BackgroundTransparency = 0,
             ZIndex = 7,
         })
-        tbl5:Create("UICorner", {Parent = tbl7.Knob.Instance, CornerRadius = newUDim(0, 10)})
+        tbl5:Create("UICorner", {Parent = tbl7.Knob.Instance, CornerRadius = newUDim(1, 0)})
         tbl7.UIStroke = tbl5:Create("UIStroke", {Parent = tbl7.Indicator.Instance, Color = fromRGB(50, 34, 23), ApplyStrokeMode = Enum.ApplyStrokeMode.Border})
         tbl7.UIStroke:AddToTheme({Color = "Border"})
-        tbl5:Create("UICorner", {Parent = tbl7.Indicator.Instance, CornerRadius = newUDim(0, 10)})
+        tbl5:Create("UICorner", {Parent = tbl7.Indicator.Instance, CornerRadius = newUDim(1, 0)})
         tbl7.Check = tbl5:Create("TextLabel", {
             Parent = tbl7.Indicator.Instance,
             FontFace = connection.IconFont,
@@ -2347,7 +2393,7 @@ do
             Text = item2.Name,
             Name = "\000",
             BorderColor3 = fromRGB(0, 0, 0),
-            Size = newUDim2(1, 0, 0, 15),
+            Size = newUDim2(1, -46, 1, 0),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
             BorderSizePixel = 0,
@@ -2371,7 +2417,7 @@ do
                 tbl7.Indicator:ChangeItemTheme({BackgroundColor3 = "Accent"})
                 tbl7.UIStroke:ChangeItemTheme({Color = "Light Accent"})
                 tbl7.Indicator:Tween(nil, {BackgroundColor3 = connection.Theme.Accent})
-                tbl7.Knob:Tween(nil, {Position = newUDim2(1, -14, 0.5, 0)})
+                tbl7.Knob:Tween(nil, {Position = newUDim2(1, -17, 0.5, 0)})
                 tbl7.Text:Tween(nil, {TextTransparency = 0})
                 tbl7.Check.Instance.Visible = false
                 tbl7.Shadow:Tween(nil, {ImageTransparency = 0.5})
@@ -2380,7 +2426,7 @@ do
                 tbl7.Indicator:ChangeItemTheme({BackgroundColor3 = "Element"})
                 tbl7.UIStroke:ChangeItemTheme({Color = "Border"})
                 tbl7.Indicator:Tween(nil, {BackgroundColor3 = connection.Theme.Element})
-                tbl7.Knob:Tween(nil, {Position = newUDim2(0, 2, 0.5, 0)})
+                tbl7.Knob:Tween(nil, {Position = newUDim2(0, 3, 0.5, 0)})
                 tbl7.Text:Tween(nil, {TextTransparency = 0.5})
                 tbl7.Check.Instance.Visible = false
                 tbl7.Shadow:Tween(nil, {ImageTransparency = 1})
@@ -3626,27 +3672,36 @@ tbl.Window = window
 pcall(function()
     local parent = window.Items.MainFrame and window.Items.MainFrame.Instance
     local instance = window.Items.Inline and window.Items.Inline.Instance
-    local instance2 = window.Items.Logo and window.Items.Logo.Instance
-    if instance2 then
-        instance2.Position = UDim2.new(0.5, 0, 0, 12)
-        instance2.Size = UDim2.new(0, 54, 0, 54)
-    end
     local sidebar = window.Items.Sidebar and window.Items.Sidebar.Instance
-    if sidebar and not sidebar:FindFirstChild("FlinHubWordmark") then
+    if sidebar and not sidebar:FindFirstChild("FlinHubWordmark") and not game:GetService("UserInputService").TouchEnabled then
         local wordmark = Instance.new("TextLabel")
         wordmark.Name = "FlinHubWordmark"
         wordmark.BackgroundTransparency = 1
         wordmark.BorderSizePixel = 0
-        wordmark.Text = "FLINHUB"
-        wordmark.Font = Enum.Font.FredokaOne
-        wordmark.TextSize = 9
-        wordmark.TextColor3 = Color3.fromRGB(220, 220, 230)
-        wordmark.TextXAlignment = Enum.TextXAlignment.Center
+        wordmark.Text = "FlinHUB"
+        wordmark.Font = Enum.Font.GothamBold
+        wordmark.TextSize = 18
+        wordmark.TextColor3 = Color3.fromRGB(238, 238, 242)
+        wordmark.TextXAlignment = Enum.TextXAlignment.Left
         wordmark.TextYAlignment = Enum.TextYAlignment.Center
-        wordmark.Position = UDim2.new(0, 0, 0, 68)
-        wordmark.Size = UDim2.new(1, 0, 0, 16)
+        wordmark.Position = UDim2.new(0, 64, 0, 14)
+        wordmark.Size = UDim2.new(1, -72, 0, 22)
         wordmark.ZIndex = 4
         wordmark.Parent = sidebar
+        local sub = Instance.new("TextLabel")
+        sub.Name = "FlinHubSub"
+        sub.BackgroundTransparency = 1
+        sub.BorderSizePixel = 0
+        sub.Text = "Murder Mystery 2"
+        sub.Font = Enum.Font.Gotham
+        sub.TextSize = 11
+        sub.TextTransparency = 0.45
+        sub.TextColor3 = Color3.fromRGB(238, 238, 242)
+        sub.TextXAlignment = Enum.TextXAlignment.Left
+        sub.Position = UDim2.new(0, 64, 0, 33)
+        sub.Size = UDim2.new(1, -72, 0, 16)
+        sub.ZIndex = 4
+        sub.Parent = sidebar
     end
     if parent then
         local corner = parent:FindFirstChildOfClass("UICorner")
@@ -3654,7 +3709,7 @@ pcall(function()
             corner = Instance.new("UICorner")
             corner.Parent = parent
         end
-        corner.CornerRadius = UDim.new(0, 20)
+        corner.CornerRadius = UDim.new(0, 14)
         parent.ClipsDescendants = false
     end
     if instance then
@@ -3767,6 +3822,7 @@ function window:AddTab(item)
         item = {}
     end
     local _firstMainPage = self:Page({
+        Name = item.Name or "Tab",
         Icon = item.Icon or "gear",
         Search = item.Search ~= false,
         Sidebar = item.Sidebar == true,
@@ -3775,8 +3831,8 @@ function window:AddTab(item)
     local v5 = _firstMainPage:SubPage({Name = item.Name or "Tab"})
     v5.NoFade = item.NoFade == true
     pcall(function()
-        v5.Items.Inactive.Instance.Size = UDim2.new(0, 64, 1, 0)
-        v5.Items.Inactive.Instance.TextSize = 12
+        v5.Items.Inactive.Instance.Size = UDim2.new(0, 84, 1, 0)
+        v5.Items.Inactive.Instance.TextSize = 13
     end)
     _firstMainPage.Items.Inactive.Instance.MouseButton1Down:Connect(function()
         for _, subPage in ipairs(self.SubPages) do
@@ -3893,35 +3949,12 @@ pcall(function()
     local sidebar = window.Items.Sidebar.Instance
     local theme = connection.Theme
 
-    -- sidebar logo -> user's avatar
-    if window.Items.Logo and window.Items.Logo.Instance then
-        window.Items.Logo.Instance.Visible = false
-    end
-    local mark = Instance.new("ImageLabel")
-    mark.Name = "FlinAvatar"
-    mark.BackgroundTransparency = 1
-    mark.Image = flinLogo
-    mark.AnchorPoint = Vector2.new(0.5, 0)
-    mark.Position = UDim2.new(0.5, 0, 0, 10)
-    mark.Size = UDim2.fromOffset(56, 56)
-    mark.ZIndex = 5
-    mark.Parent = sidebar
-    Instance.new("UICorner", mark).CornerRadius = UDim.new(1, 0)
-    local markStroke = Instance.new("UIStroke", mark)
-    markStroke.Thickness = 1.5
-    markStroke.Color = theme.Border
-    local wm = sidebar:FindFirstChild("FlinHubWordmark")
-    if wm then
-        wm.Text = "FlinHUB"
-        wm.FontFace = FlinFont
-        wm.TextSize = 12
-        wm.Position = UDim2.new(0, 0, 0, 70)
-    end
+    local markStroke = {}
 
     -- window outline
     local outline = main:FindFirstChild("FlinOutline") or Instance.new("UIStroke")
     outline.Name = "FlinOutline"
-    outline.Thickness = 2
+    outline.Thickness = 1
     outline.Color = theme.Border
     outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     outline.Parent = main
@@ -4021,20 +4054,20 @@ pcall(function()
         b.TextColor3 = theme.Text
         b.BackgroundColor3 = theme.Element
         b.AnchorPoint = Vector2.new(1, 0)
-        b.Position = UDim2.new(1, offset, 0, 10)
-        b.Size = UDim2.fromOffset(26, 26)
+        b.Position = UDim2.new(1, offset, 0, 13)
+        b.Size = UDim2.fromOffset(28, 28)
         b.ZIndex = 50
         b.Parent = main
-        Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
         local s = Instance.new("UIStroke", b)
-        s.Thickness = 1.5
+        s.Thickness = 1
         s.Color = theme.Border
         b.MouseEnter:Connect(function() TweenService:Create(s, TweenInfo.new(0.12), {Color = connection.Theme["Light Accent"]}):Play() end)
         b.MouseLeave:Connect(function() TweenService:Create(s, TweenInfo.new(0.12), {Color = connection.Theme.Border}):Play() end)
         return b
     end
-    local minBtn = headerButton("-", -44)
-    local closeBtn = headerButton("X", -12)
+    local minBtn = headerButton("-", -48)
+    local closeBtn = headerButton("X", -14)
     minBtn.Name = "FlinMinimize"
     closeBtn.Name = "FlinClose"
     minBtn.MouseButton1Click:Connect(function()
@@ -9227,75 +9260,6 @@ if window.Items.Shadow and window.Items.Shadow.Instance then
     window.Items.Shadow.Instance.Size = UDim2.new(1, 55, 1, 55)
     window.Items.Shadow.Instance.Position = UDim2.new(0.5, 0, 0.5, 0)
 end
--- ===== FlinHUB layout: wide sidebar with labelled tabs =====
-pcall(function()
-    if game:GetService("UserInputService").TouchEnabled then return end
-    local sidebar = window.Items.Sidebar.Instance
-    local mark = sidebar:FindFirstChild("FlinAvatar")
-    if mark then
-        mark.AnchorPoint = Vector2.new(0, 0)
-        mark.Position = UDim2.new(0, 16, 0, 14)
-        mark.Size = UDim2.fromOffset(52, 52)
-    end
-    local wm = sidebar:FindFirstChild("FlinHubWordmark")
-    if wm then
-        wm.Position = UDim2.new(0, 76, 0, 14)
-        wm.Size = UDim2.new(1, -84, 0, 52)
-        wm.TextXAlignment = Enum.TextXAlignment.Left
-        wm.TextSize = 26
-    end
-    local list = window.Items.Pages.Instance
-    list.Position = UDim2.new(0, 0, 0, 86)
-    list.Size = UDim2.new(1, 0, 1, -150)
-    local layout = list:FindFirstChildOfClass("UIListLayout")
-    if layout then layout.Padding = UDim.new(0, 8) end
-    local meta = {
-        ["gear"] = {1, "General"},
-        ["crosshairs"] = {2, "MM2"},
-        ["person"] = {3, "Target"},
-        ["eye"] = {4, "Visuals"},
-        ["star"] = {5, "Fun"},
-        ["person-jumping"] = {6, "Emotes"},
-        ["speaker"] = {7, "Sound"},
-    }
-    for _, page in ipairs(window.Pages) do
-        local info = meta[page.Icon]
-        local btn = page.Items and page.Items.Inactive and page.Items.Inactive.Instance
-        if info and btn and btn.Parent == list then
-            btn.LayoutOrder = info[1]
-            btn.Size = UDim2.new(1, -28, 0, 40)
-            btn.TextXAlignment = Enum.TextXAlignment.Left
-            btn.BackgroundTransparency = 1
-            btn.BackgroundColor3 = connection.Theme.Element
-            local pad = Instance.new("UIPadding", btn)
-            pad.PaddingLeft = UDim.new(0, 14)
-            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
-            local st = Instance.new("UIStroke", btn)
-            st.Thickness = 1.5
-            st.Color = connection.Theme.Border
-            st.Transparency = 1
-            local lbl = Instance.new("TextLabel")
-            lbl.BackgroundTransparency = 1
-            lbl.Text = info[2]
-            lbl.FontFace = FlinFont
-            lbl.TextSize = 18
-            lbl.TextColor3 = connection.Theme.Text
-            lbl.TextXAlignment = Enum.TextXAlignment.Left
-            lbl.Position = UDim2.new(0, 38, 0, 0)
-            lbl.Size = UDim2.new(1, -38, 1, 0)
-            lbl.ZIndex = btn.ZIndex + 1
-            lbl.Parent = btn
-            local function sync()
-                local active = btn.TextTransparency < 0.25
-                lbl.TextTransparency = active and 0 or 0.45
-                st.Transparency = active and 0 or 1
-                btn.BackgroundTransparency = active and 0.55 or 1
-            end
-            btn:GetPropertyChangedSignal("TextTransparency"):Connect(sync)
-            sync()
-        end
-    end
-end)
 if tbl and tbl.Language == "Russian" then
     task.defer(function()
         local applyLanguage = tbl

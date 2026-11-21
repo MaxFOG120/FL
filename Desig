@@ -7,7 +7,7 @@ FlinHUB.lua загружает этот файл как Lua-модуль и со
 Не удаляй строки-маркеры и не запускай этот файл отдельно.
 ]]
 local FlinDesign = {
-    Version = "FlinDesign / FlinHUB 2.0",
+    Version = "FlinDesign / FlinHUB 1.0",
     Core = [========================================[
 local function forEachYield(iterator, state, control)
     local yield = coroutine.yield
@@ -8194,10 +8194,29 @@ end)();
         Name = "Infinite Void",
         Icon = "circle-slash",
         Callback = function()
-            pcall(function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/InfiniteVoid"))()
+            -- Внешний скрипт (Luraph) может падать с "attempt to index nil with 'id'".
+            -- Запускаем в отдельном потоке под pcall, чтобы не ломать FlinHUB.
+            task.spawn(function()
+                local okGet, src = pcall(function()
+                    return game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/InfiniteVoid")
+                end)
+                if not okGet or type(src) ~= "string" or #src == 0 then
+                    tbl3.new({Title = "Infinite Void", Content = "Не удалось скачать скрипт.", Duration = 3})
+                    return
+                end
+                local fnVoid, compileErr = loadstring(src, "@InfiniteVoid")
+                if not fnVoid then
+                    tbl3.new({Title = "Infinite Void", Content = "Ошибка компиляции: " .. tostring(compileErr), Duration = 3})
+                    return
+                end
+                local okRun, runErr = pcall(fnVoid)
+                if okRun then
+                    tbl3.new({Title = "Infinite Void", Content = "Executed script.", Duration = 2})
+                else
+                    warn("[FlinHUB] Infinite Void: " .. tostring(runErr))
+                    tbl3.new({Title = "Infinite Void", Content = "Скрипт не поддерживается в этой игре/executor.", Duration = 3})
+                end
             end)
-            tbl3.new({Title = "Infinite Void", Content = "Executed script.", Duration = 2})
         end,
     })
     local spinSection = funTab:AddSection({Name = "Spin", Position = "left"})

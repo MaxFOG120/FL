@@ -8,7 +8,7 @@ local DESIGN_URL = "https://raw.githubusercontent.com/MaxFOG120/FL/refs/heads/ma
 
 -- Пока Discord-сервер не создан, оставь строку пустой.
 -- Когда появится приглашение, вставь его сюда — ссылка будет копироваться при запуске.
-local DISCORD_INVITE_URL = "https://discord.gg/6DAMzHeMr"
+local DISCORD_INVITE_URL = ""
 local function copyDiscordInvite()
     local invite = DISCORD_INVITE_URL
     if type(invite) ~= "string" or invite == "" then
@@ -425,15 +425,7 @@ pcall(function()
             end)
         end
     end)
-    local fogNext = 0
-    RunService.Heartbeat:Connect(function()
-        local t = os.clock()
-        if t < fogNext then
-            return
-        end
-        fogNext = t + 0.25
-        fn50()
-    end)
+    RunService.Heartbeat:Connect(fn50)
 end)
 VirtualInputManager = game:GetService("VirtualInputManager")
 LP = Players.LocalPlayer
@@ -2749,7 +2741,7 @@ do
         function tbl.kbBind(v3, item, v4)
             local option = v3:AddOption()
             tbl.kbUI = tbl.kbUI or {}
-            local keybind = option:AddLabel("Keybind"):AddKeybind({
+            local keybind = option:AddLabel("Бинд клавиши"):AddKeybind({
                 Callback = function(key)
                     tbl.kb[v4].key = key
                 end,
@@ -2870,7 +2862,7 @@ do
                 end)
             end
             if not enabled4 then
-                option:AddButton({Name = "Configure", Icon = "gear", Callback = fn69})
+                option:AddButton({Name = "Настроить", Icon = "gear", Callback = fn69})
             end
         end
         function tbl.kbTglRow(v3, v4, v5, v6)
@@ -8257,40 +8249,11 @@ end
 
 -- Дизайн загружается только по RAW-ссылке DESIGN_URL.
 local designSource
-local remoteSource
-for _, path in ipairs({"FlinHUB/FlinDesign.lua", "FlinDesign.lua"}) do
-    if not designSource and type(isfile) == "function" and type(readfile) == "function" then
-        local okLocal, localSource = pcall(function()
-            return isfile(path) and readfile(path) or nil
-        end)
-        if okLocal and type(localSource) == "string" and #localSource > 0 then
-            designSource = localSource
-        end
-    end
-end
-if not designSource then
-    local okHttp
-    okHttp, remoteSource = pcall(function()
-        return game:HttpGet(DESIGN_URL)
-    end)
-    if okHttp and type(remoteSource) == "string" and #remoteSource > 0 then
-        designSource = remoteSource
-        pcall(function()
-            if writefile then
-                if makefolder and not (isfolder and isfolder("FlinHUB")) then
-                    makefolder("FlinHUB")
-                end
-                writefile("FlinHUB/FlinDesign.cache.lua", remoteSource)
-            end
-        end)
-    elseif type(isfile) == "function" and type(readfile) == "function" then
-        local okCache, cached = pcall(function()
-            return isfile("FlinHUB/FlinDesign.cache.lua") and readfile("FlinHUB/FlinDesign.cache.lua") or nil
-        end)
-        if okCache and type(cached) == "string" and #cached > 0 then
-            designSource = cached
-        end
-    end
+local okHttp, remoteSource = pcall(function()
+    return game:HttpGet(DESIGN_URL)
+end)
+if okHttp and type(remoteSource) == "string" and #remoteSource > 0 then
+    designSource = remoteSource
 end
 
 if not designSource then
@@ -8319,4 +8282,11 @@ local runChunk, compileError = loadstring(mergedSource, "@FlinHUB_Merged.lua")
 if not runChunk then
     fail("Объединённый скрипт не компилируется: " .. tostring(compileError))
 end
-return runChunk()
+local okRun, runErr = xpcall(runChunk, function(err)
+    return tostring(err) .. "\n" .. (debug and debug.traceback and debug.traceback("", 2) or "")
+end)
+if not okRun then
+    warn("[FlinHUB] Ошибка запуска: " .. tostring(runErr))
+    error(runErr, 0)
+end
+return runErr
